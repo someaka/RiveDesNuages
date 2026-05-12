@@ -1,0 +1,60 @@
+## planner profile — DS4Pro reasoning for task decomposition
+## Usage: hermes -p planner
+## Primary: Ollama Cloud (ds4pro) | Fallback: OpenCode Go (ds4pro) | Nous Qwen3.6 Plus | DeepSeek V4 Flash
+
+model:
+  default: ds4pro
+  ## Primary: Ollama Cloud
+  providers:
+    ollama-cloud:
+      base_url: https://api.ollama.cloud/v1   ## ⚠️ TENTATIVE — confirm
+      api_key_env: OLLAMA_API_KEY
+    ## Fallback 1: OpenCode Go (DS4Pro also available there)
+    opencode-go:
+      base_url: https://opencode.ai/zen/go/v1
+      api_key_env: OPENCODE_GO_API_KEY         ## ⚠️ TBD — confirm key
+    ## Fallback 2: Nous Qwen3.6 Plus (auxiliary reasoning model)
+    nous:
+      base_url: https://api.nousresearch.com/v1
+      api_key_env: NOUS_API_KEY               ## ⚠️ TBD — confirm key/env name
+    ## Fallback 3: DeepSeek V4 Flash via OpenCode Go (absolute last resort)
+    ## Note: shares opencode-go provider — config may need model override
+    # opencode-go-flash:
+    #   base_url: https://opencode.ai/zen/go/v1
+    #   api_key_env: OPENCODE_GO_API_KEY
+    #   model_override: deepseek-v4-flash
+
+## Planner needs strong reasoning, longer context, more turns
+agent:
+  max_turns: 200
+  tool_use_enforcement: auto
+  reasoning_effort: high
+  gateway_timeout: 1200
+  api_max_retries: 4
+
+## Toolsets: research, search, memory — no heavy execution
+toolsets:
+- hermes-cli
+- web
+- memory
+- session_search
+- skills
+- code_execution          ## lightweight validation only
+- file                    ## read-only analysis
+- vision                  ## can analyze diagrams/screenshots
+
+display:
+  personality: technical
+  show_reasoning: true
+  show_cost: true
+  streaming: true
+  interim_assistant_messages: true         ## show thinking progress
+
+## Scheduling:
+## Subject to Ollama Cloud peak degradation 13:00–18:00 UTC+2
+## Nous / OpenCode: no known peak constraints
+compression:
+  enabled: true
+  threshold: 0.4
+  target_ratio: 0.15
+  protect_last_n: 25

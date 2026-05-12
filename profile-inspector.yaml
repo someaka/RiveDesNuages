@@ -1,0 +1,54 @@
+## inspector profile — GLM5.1 via Ollama Cloud (hosted, not local)
+## Usage: hermes -p inspector
+## Primary: Ollama Cloud (glm5.1) | Fallback: Nous Qwen3.6 Plus | DeepSeek V4 Flash
+
+model:
+  default: glm5.1:cloud
+  ## Primary: Ollama Cloud (hosted, NOT localhost)
+  providers:
+    ollama-cloud:
+      base_url: https://api.ollama.cloud/v1   ## ⚠️ TENTATIVE — confirm
+      api_key_env: OLLAMA_API_KEY
+    ## Fallback 1: Nous Qwen3.6 Plus (auxiliary QA model)
+    nous:
+      base_url: https://api.nousresearch.com/v1
+      api_key_env: NOUS_API_KEY               ## ⚠️ TBD — confirm key/env name
+    ## Fallback 2: DeepSeek V4 Flash via OpenCode Go (absolute last resort)
+    opencode-go:
+      base_url: https://opencode.ai/zen/go/v1
+      api_key_env: OPENCODE_GO_API_KEY         ## ⚠️ TBD — confirm key
+
+## Inspector: quality assurance, review, catch mistakes
+## Needs patience, thoroughness, long context for auditing
+agent:
+  max_turns: 300
+  tool_use_enforcement: auto
+  reasoning_effort: high
+  gateway_timeout: 1200
+  api_max_retries: 3
+
+## Toolsets: read-heavy, memory, search — inspection toolkit
+toolsets:
+- hermes-cli
+- memory
+- session_search
+- skills
+- file                    ## read + write for patch suggestions
+- vision                  ## visual QA if needed
+- code_execution          ## verify fixes before approval
+
+display:
+  personality: helpful
+  show_reasoning: true
+  show_cost: false         ## cloud cost tracked separately via Ollama subscription
+  streaming: true
+  interim_assistant_messages: true
+
+## Scheduling:
+## Subject to Ollama Cloud peak degradation 13:00–18:00 UTC+2
+## Nous / OpenCode: no known peak constraints
+compression:
+  enabled: true
+  threshold: 0.5
+  target_ratio: 0.2
+  protect_last_n: 20

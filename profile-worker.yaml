@@ -1,0 +1,63 @@
+## worker profile — K2.6 execution engine
+## Usage: hermes -p worker
+
+model:
+  default: k2.6
+  ## Primary: Moonshots Direct
+  providers:
+    moonshot:
+      base_url: https://api.moonshot.cn/v1
+      api_key_env: KIMI_API_KEY
+    ## Fallback 1: Ollama Cloud (K2.6 also hosted there)
+    ollama-cloud:
+      base_url: https://api.ollama.cloud/v1   ## ⚠️ TENTATIVE — confirm
+      api_key_env: OLLAMA_API_KEY
+    ## Fallback 2: Nous Qwen3.6 Plus (auxiliary model, last resort before flash)
+    nous:
+      base_url: https://api.nousresearch.com/v1
+      api_key_env: NOUS_API_KEY               ## ⚠️ TBD — confirm key/env name
+    ## Fallback 3: DeepSeek V4 Flash via OpenCode Go (absolute last resort)
+    opencode-go:
+      base_url: https://opencode.ai/zen/go/v1
+      api_key_env: OPENCODE_GO_API_KEY         ## ⚠️ TBD — confirm key
+
+## K2.6 is an execution engine, not a thinker.
+## Keep context tight, max turns moderate, no reasoning fluff.
+agent:
+  max_turns: 60
+  tool_use_enforcement: required
+  reasoning_effort: ""                     ## no reasoning — pure execution
+  gateway_timeout: 600
+  api_max_retries: 4                       ## extra retries for multi-tier failover
+
+## Toolsets: full system access for execution
+toolsets:
+- hermes-cli
+- terminal
+- file
+- code_execution
+- web
+- memory
+- session_search
+- skills
+- vision
+- image_gen
+- tts
+- cronjob
+
+display:
+  personality: concise
+  show_reasoning: false
+  show_cost: true
+  streaming: true
+  interim_assistant_messages: false         ## clean output for K2.6 throughput
+
+## Scheduling:
+## Moonshots direct: 16:00–02:00 UTC+2 (shared infra with MIMO)
+## Ollama Cloud fallback: avoid 13:00–18:00 UTC+2 peak
+## Nous / OpenCode: no known peak constraints
+compression:
+  enabled: true
+  threshold: 0.5
+  target_ratio: 0.2
+  protect_last_n: 10
