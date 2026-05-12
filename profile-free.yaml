@@ -1,22 +1,17 @@
 ## free profile — ring-2.6-1t (OpenRouter free tier)
 ## Usage: hermes -p free
-## Primary: OpenRouter ring-2.6-1t | Fallback: Nous Qwen3.6 Plus | DeepSeek V4 Flash
 
 model:
-  default: ring-2.6-1t
-  ## Primary: OpenRouter (free, temporary offer)
-  providers:
-    openrouter:
-      base_url: https://openrouter.ai/api/v1
-      api_key_env: OPENROUTER_API_KEY               ## ✅ Already in .env
-    ## Fallback 1: Nous Qwen3.6 Plus (auxiliary model, free tier)
-    nous:
-      base_url: https://api.nousresearch.com/v1
-      api_key_env: NOUS_API_KEY                      ## ⚠️ TBD — confirm key/env name
-    ## Fallback 2: DeepSeek V4 Flash via OpenCode Go (absolute last resort)
-    opencode-go:
-      base_url: https://opencode.ai/zen/go/v1
-      api_key_env: OPENCODE_GO_API_KEY               ## ⚠️ TBD — confirm key
+  default: inclusionai/ring-2.6-1t:free
+  provider: openrouter
+  base_url: https://openrouter.ai/api/v1
+  api_mode: chat_completions
+providers: {}
+fallback_providers:
+- provider: nous
+  model: qwen/qwen3.6-plus
+  base_url: https://inference-api.nousresearch.com/v1
+credential_pool_strategies: {}
 
 ## Free-tier profile: lighter toolset, no heavy execution
 ## Use for: quick analysis, reasoning, QA on a budget
@@ -34,8 +29,8 @@ toolsets:
 - memory
 - session_search
 - skills
-- file                    ## read-only analysis
-- vision                  ## can analyze diagrams/screenshots
+- file
+- vision
 
 display:
   personality: helpful
@@ -46,7 +41,7 @@ display:
 
 ## Scheduling:
 ## No known peak constraints on OpenRouter
-## Nous / OpenCode: no known peak constraints
+## Nous: no known peak constraints
 compression:
   enabled: true
   threshold: 0.5
