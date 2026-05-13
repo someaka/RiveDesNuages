@@ -293,68 +293,50 @@ Stage 11 (Auditor)      →  YOU         →  human review
 
 ### 🆓 `free` — Zero-Cost Research Profile
 - **Model:** ring-2.6-1t (OpenRouter)
-- **Primary:** OpenRouter (`OPENROUTER_API_KEY` ✅ in `.env`)
-- **Fallback 1:** Nous Qwen3.6 Plus — ⚠️ needs `NOUS_API_KEY`
-- **Fallback 2:** DeepSeek V4 Flash via OpenCode Go — ⚠️ needs `OPENCODE_GO_API_KEY`
+- **Primary:** OpenRouter
+- **Fallback 1:** Nous Qwen3.6 Plus
+- **Fallback 2:** DeepSeek V4 Flash via OpenCode Go
 - **Character:** Helpful, reasoning shown, lighter toolset (no code execution, no system tools)
 - **Max turns:** 120
 - **Pipeline role:** Stage 1 — Investigate
 
 ### 🧠 `planner` — DS4Pro Reasoning
 - **Model:** ds4pro
-- **Primary:** Ollama Cloud (`OLLAMA_API_KEY` ✅ in `.env`)
-- **Fallback 1:** OpenCode Go DS4Pro — ⚠️ needs `OPENCODE_GO_API_KEY`
-- **Fallback 2:** Nous Qwen3.6 Plus — ⚠️ needs `NOUS_API_KEY`
-- **Fallback 3:** DeepSeek V4 Flash via OpenCode Go — ⚠️ needs `OPENCODE_GO_API_KEY`
+- **Primary:** Ollama Cloud
+- **Fallback 1:** OpenCode Go DS4Pro
+- **Fallback 2:** Nous Qwen3.6 Plus
+- **Fallback 3:** DeepSeek V4 Flash via OpenCode Go
 - **Character:** Technical, full reasoning visible
 - **Max turns:** 200
 - **Pipeline role:** Stages 2–3 (Specs + Plan)
 
 ### 🔧 `worker` — K2.6 Execution Engine
 - **Model:** k2.6
-- **Primary:** Moonshots (`KIMI_API_KEY`) ❌ MISSING
-- **Fallback 1:** Ollama Cloud K2.6 (`OLLAMA_API_KEY` ✅ in `.env`)
-- **Fallback 2:** Nous Qwen3.6 Plus — ⚠️ needs `NOUS_API_KEY`
-- **Fallback 3:** DeepSeek V4 Flash via OpenCode Go — ⚠️ needs `OPENCODE_GO_API_KEY`
+- **Primary:** Moonshots
+- **Fallback 1:** Ollama Cloud K2.6
+- **Fallback 2:** Nous Qwen3.6 Plus
+- **Fallback 3:** DeepSeek V4 Flash via OpenCode Go
 - **Character:** Concise, no reasoning fluff, tool-use enforced
 - **Max turns:** 60
 - **Pipeline role:** Stages 5, 7, 10 (Execute + Fix + Polish + Final Fix)
 
 ### 🔍 `inspector` — GLM5.1 QA Review
 - **Model:** glm5.1:cloud
-- **Primary:** Ollama Cloud (`OLLAMA_API_KEY` ✅ in `.env`)
-- **Fallback 1:** Nous Qwen3.6 Plus — ⚠️ needs `NOUS_API_KEY`
-- **Fallback 2:** DeepSeek V4 Flash via OpenCode Go — ⚠️ needs `OPENCODE_GO_API_KEY`
+- **Primary:** Ollama Cloud
+- **Fallback 1:** Nous Qwen3.6 Plus
+- **Fallback 2:** DeepSeek V4 Flash via OpenCode Go
 - **Character:** Helpful, thorough, shows reasoning for audit trails
 - **Max turns:** 300
 - **Pipeline role:** Stages 4, 6, 8, 9 (Verify Plan + Verify Execution + Inspection + Verification)
 
 ---
 
-## 🔑 Credential Status
-
-| Key | Used By | Status |
-|---|---|---|
-| `KIMI_API_KEY` | worker primary | ❌ Missing from `.env` |
-| `OLLAMA_API_KEY` | worker fallback, planner primary, inspector primary | ✅ In `.env` |
-| `OPENROUTER_API_KEY` | free primary | ✅ In `.env` |
-| `NOUS_API_KEY` | All profiles fallback 1 | ❌ TBD |
-| `OPENCODE_GO_API_KEY` | Planner fb, all profiles last resort | ❌ TBD |
-
----
-
 ## ⚠️ Remaining Confirmations
-1. **`KIMI_API_KEY`** — `sk-kimi-*` format or legacy?
-2. **Ollama Cloud `base_url`** — `https://api.ollama.cloud/v1`?
-3. **`NOUS_API_KEY`** — portal login or API key format?
-4. **`OPENCODE_GO_API_KEY`** — needed, or is the $5 allocation keyless?
-5. **DeepSeek V4 Flash model name** — `deepseek-v4-flash` in OpenCode Go?
-6. **Nous Qwen3.6 Plus model name** — `qwen3.6-plus` confirmed?
-7. **ZenMux evaluation** — pending TPS / catalog mapping
-8. **Phase 1 specialist roster** — central planning artifact
-9. **Moonshots Discord** — MIMO $70/month answer
-10. **Rate limits / expirations** on temp free offers
-11. **Profile sync git repo** — proposed, not started
-12. **Validate all profiles** — `hermes -p <name> chat -q "ping"` once credentials land
-13. **Local Qwen benchmark results** — awaiting promotion decision
-14. **Inspector fallback satisfaction** — Qwen3.6 Plus + DeepSeek Flash as safety net?
+1. **DeepSeek V4 Flash model name** — `deepseek-v4-flash` in OpenCode Go?
+2. **Nous Qwen3.6 Plus model name** — `qwen3.6-plus` confirmed?
+3. **ZenMux evaluation** — pending TPS / catalog mapping
+4. **Phase 1 specialist roster** — central planning artifact
+5. **Moonshots Discord** — MIMO $70/month answer
+6. **Rate limits / expirations** on temp free offers
+7. **Local Qwen benchmark results** — awaiting promotion decision
+8. **Inspector fallback satisfaction** — Qwen3.6 Plus + DeepSeek Flash as safety net?

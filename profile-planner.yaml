@@ -2,9 +2,9 @@
 ## Usage: hermes -p planner
 
 model:
-  default: ds4pro
+  default: deepseek-v4-pro
   provider: ollama-cloud
-  base_url: https://api.ollama.cloud/v1
+  base_url: https://ollama.com/v1
   api_mode: chat_completions
 providers: {}
 fallback_providers:

@@ -17,4 +17,3 @@
 
 ## Notes
 - These are **snapshot copies**, not symlinks. If the originals change, this folder will drift.
-- The `.env`-referenced keys (`KIMI_API_KEY`, `NOUS_API_KEY`, `OPENCODE_GO_API_KEY`) are NOT included here — they stay on the machine that owns `.env`.

@@ -45,27 +45,6 @@ This means:
 
 ---
 
-## The Credential Reality
-
-The pipeline is fully designed but **cannot execute** without credentials being wired in by the main machine agent. This is by design:
-- The user's main agent has access to `.env` and knows the key formats
-- This session established *what* needs to exist; the main machine agent will *create* it
-- The notes are the handoff document — structured enough for any agent to consume
-
-### Credential Chain
-```
-KIMI_API_KEY          → worker primary      → still needed
-OLLAMA_API_KEY        → worker fallback,     → already in .env ✅
-                       → planner primary,
-                       → inspector primary
-OPENROUTER_API_KEY    → free primary         → already in .env ✅
-NOUS_API_KEY          → universal fallback    → still needed
-OPENCODE_GO_API_KEY   → planner failover,    → still needed
-                       → universal last resort
-OLLAMA_CLOUD_BASE_URL → planner, inspector,  → "https://api.ollama.cloud/v1"?
-                       → worker fallback
-```
-
 ---
 
 ## Endpoints People Forget

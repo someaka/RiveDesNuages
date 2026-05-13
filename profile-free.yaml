@@ -2,15 +2,15 @@
 ## Usage: hermes -p free
 
 model:
-  default: inclusionai/ring-2.6-1t:free
-  provider: openrouter
-  base_url: https://openrouter.ai/api/v1
+  default: qwen/qwen3.6-plus
+  provider: nous
+  base_url: https://inference-api.nousresearch.com/v1
   api_mode: chat_completions
 providers: {}
 fallback_providers:
-- provider: nous
-  model: qwen/qwen3.6-plus
-  base_url: https://inference-api.nousresearch.com/v1
+- provider: openrouter
+  model: inclusionai/ring-2.6-1t:free
+  base_url: https://openrouter.ai/api/v1
 credential_pool_strategies: {}
 
 ## Free-tier profile: lighter toolset, no heavy execution
