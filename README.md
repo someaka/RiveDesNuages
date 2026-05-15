@@ -3,6 +3,16 @@
 > Cloud endpoint reference archive — "Shore of Clouds"
 > Copied from `~/Desktop/agenda/` on 2026-05-12.
 > This is a self-contained mirror of the kanban profile docs and reflections.
+> **Last updated: 2026-05-15** — ring-2.6-1t and qwen3.6-plus expired. DeepSeek V4 Flash on Nous is now the sole free universal fallback.
+
+## Current State
+
+As of 2026-05-15, the free model landscape shifted:
+- 🚫 **ring-2.6-1t (OpenRouter)** — expired
+- 🚫 **qwen3.6-plus (Nous)** — expired
+- ✅ **DeepSeek V4 Flash (Nous)** — now the primary for `free` profile, model name `deepseek/deepseek-v4-flash`
+- ✅ **stepfun/step-3.5-flash (Nous)** — new fallback for `free` profile, proven in auxiliary tasks
+- 📍 Ground truth config lives at `~/.hermes/config.yaml` — single-model: deepseek v4 flash on Nous with OpenRouter fallback
 
 ## Contents
 

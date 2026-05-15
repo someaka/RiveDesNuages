@@ -9,7 +9,7 @@ model:
 providers: {}
 fallback_providers:
 - provider: nous
-  model: qwen/qwen3.6-plus
+  model: deepseek/deepseek-v4-flash
   base_url: https://inference-api.nousresearch.com/v1
 credential_pool_strategies: {}
 

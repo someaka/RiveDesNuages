@@ -1,20 +1,22 @@
-## free profile — ring-2.6-1t (OpenRouter free tier)
+## free profile — DeepSeek V4 Flash (zero-cost investigation)
 ## Usage: hermes -p free
+## Primary: deepseek/deepseek-v4-flash on Nous (free, may be temp)
+## Fallback: stepfun/step-3.5-flash on Nous (free, proven in auxiliary tasks)
 
 model:
-  default: qwen/qwen3.6-plus
+  default: deepseek/deepseek-v4-flash
   provider: nous
   base_url: https://inference-api.nousresearch.com/v1
   api_mode: chat_completions
 providers: {}
 fallback_providers:
-- provider: openrouter
-  model: inclusionai/ring-2.6-1t:free
-  base_url: https://openrouter.ai/api/v1
+- provider: nous
+  model: stepfun/step-3.5-flash
+  base_url: https://inference-api.nousresearch.com/v1
 credential_pool_strategies: {}
 
 ## Free-tier profile: lighter toolset, no heavy execution
-## Use for: quick analysis, reasoning, QA on a budget
+## Use for: quick analysis, reasoning, investigation on a budget
 agent:
   max_turns: 120
   tool_use_enforcement: auto
@@ -40,8 +42,7 @@ display:
   interim_assistant_messages: true
 
 ## Scheduling:
-## No known peak constraints on OpenRouter
-## Nous: no known peak constraints
+## No known peak constraints on Nous
 compression:
   enabled: true
   threshold: 0.5

@@ -52,9 +52,33 @@ This means:
 Every conversation, the user says "I'll remember a few more later." They never do all at once. The TBD list in the main notes is the living registry. New endpoints get added here first, promoted to the structured notes when they survive a full conversation cycle.
 
 Current TBD candidates (unconfirmed):
-- Additional Nous portal endpoints beyond qwen3.6-plus
+~~- Additional Nous portal endpoints beyond qwen3.6-plus~~ ❌ **Moot** — qwen3.6-plus expired
 - Any endpoints from the ZenMux full catalog once evaluation completes
 - Whether local Qwen 3.6 variants graduate from proving ground to production
+
+---
+
+## The Great Free-Model Extinction Event (2026-05-15)
+
+Two free models died on the same day:
+
+1. **ring-2.6-1t (OpenRouter)** — was the `free` profile's primary for Stage 1 (Investigate). Outstanding TPS, zero cost. Gone.
+2. **qwen3.6-plus (Nous)** — was the universal fallback for ALL four profiles. Every profile's safety net. Gone.
+
+**What survived:** DeepSeek V4 Flash on Nous (`deepseek/deepseek-v4-flash`). It's free *for now*, but so were the other two. The pattern is clear: **free offers on inference APIs are temporary by nature.** The only permanent $0 inference path is local models.
+
+### Implications
+- The `free` profile is **mothballed** — no working free model to drive it
+- Current config.yaml is a **single-model setup**: deepseek-v4-flash on Nous, OpenRouter fallback for the same model
+- The kanban pipeline still exists conceptually (profiles for planner/inspector/worker on paid endpoints) but investigation (Stage 1) has no dedicated zero-cost model
+- **Local models are the only reliable long-term $0 path** — qwen3.6 27B or 35B A3B benchmarking just became more urgent
+- DeepSeek V4 Flash on Nous is now the single thread holding the free tier together
+
+### Resurrection: stepfun/step-3.5-flash as Free Fallback
+
+The `free` profile was revived using `stepfun/step-3.5-flash` on Nous as its fallback — the same model already proven in Hermes' auxiliary tasks (web_extract, compression, session_search, skills_hub, approval, mcp, title_generation, triage_specifier, curator). It's not a reasoning powerhouse like DS4Pro, but for investigation-stage research and quick analysis, it's more than enough. And it costs $0 — for now.
+
+**Moral:** When free primaries die, look at what you're already running in the background. Sometimes the workhorse is already in the stable.
 
 ---
 

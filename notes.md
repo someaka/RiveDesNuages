@@ -1,8 +1,9 @@
 # Endpoint Notes
 
 > Compiled from conversation on 2026-05-11. Ongoing — updated as user rambles through.
-> Last update: 2026-05-12 — added operational kanban pipeline (investigation → audit loop) mapped to profiles.
+> Last update: 2026-05-15 — ring-2.6-1t and qwen3.6-plus expired, DeepSeek V4 Flash on Nous promoted to universal fallback.
 > Mirror copy — original lives at ~/Desktop/agenda/notes.md
+> Ground truth config: ~/.hermes/config.yaml (single-model: deepseek/deepseek-v4-flash on Nous)
 
 ---
 
@@ -14,8 +15,8 @@ The full delivery pipeline, mapped to profiles. Each stage has a **gate** — cr
  ┌──────────────┐    ┌──────────┐    ┌─────────┐    ┌──────────────┐    ┌──────────────┐
  │ INVESTIGATE  │───→│ SPECS    │───→│ PLAN    │───→│ VERIFY PLAN  │───→│ EXECUTE      │
  │              │    │          │    │         │    │              │    │              │
- │ free / ring  │    │ planner  │    │ planner │    │ inspector    │    │ worker       │
- │ ring-2.6-1t  │    │ DS4Pro   │    │ DS4Pro  │    │ GLM5.1       │    │ K2.6         │
+ │ free         │    │ planner  │    │ planner │    │ inspector    │    │ worker       │
+ │ DS4Flash     │    │ DS4Pro   │    │ DS4Pro  │    │ GLM5.1       │    │ K2.6         │
  │ (zero cost)  │    │ Ollama   │    │         │    │ Ollama Cloud │    │ Moonshots    │
  └──────┬───────┘    └────┬─────┘    └────┬────┘    └──────┬───────┘    └──────┬───────┘
         │                  │               │                │                   │
@@ -41,9 +42,10 @@ The full delivery pipeline, mapped to profiles. Each stage has a **gate** — cr
 
 ### Stage Definitions
 
-#### 1. INVESTIGATE — `free` profile (ring-2.6-1t)
+#### 1. INVESTIGATE — `free` profile (DeepSeek V4 Flash)
 - **Goal:** Understand the problem space. Gather context, research, explore.
 - **Profile:** `free` ← zero cost, lightweight, no heavy tools
+- **Model:** `deepseek/deepseek-v4-flash` (Nous — direct). Fallback: `stepfun/step-3.5-flash` (Nous).
 - **Toolsets:** web search, memory, session search, file read, vision
 - **Output:** Problem statement, constraints, scope definition
 - **Handoff gate:** Problem is clearly defined. Scope is bounded.
@@ -115,25 +117,26 @@ The full delivery pipeline, mapped to profiles. Each stage has a **gate** — cr
 
 ## PIPELINE × PROFILE MATRIX
 
-| Stage | Profile | Model | Provider | Cost Path |
-|---|---|---|---|---|
-| 1. Investigate | `free` | ring-2.6-1t | OpenRouter | Free (temp) |
-| 2. Specs | `planner` | DS4Pro | Ollama Cloud | $15/yr |
-| 3. Plan | `planner` | DS4Pro | Ollama Cloud | $15/yr |
-| 4. Verify Plan | `inspector` | GLM5.1:cloud | Ollama Cloud | $15/yr |
-| 5. Execute | `worker` | K2.6 | Moonshots | $40/mo |
-| 6. Verify Execution | `inspector` | GLM5.1:cloud | Ollama Cloud | $15/yr |
-| 7. Fix & Polish | `worker` | K2.6 | Moonshots | $40/mo |
-| 8. Inspection | `inspector` | GLM5.1:cloud | Ollama Cloud | $15/yr |
-| 9. Verification | `inspector` | GLM5.1:cloud | Ollama Cloud | $15/yr |
-| 10. Fix | `worker` | K2.6 | Moonshots | $40/mo |
-| 11. Notify | — | — | — | — |
+| Stage | Profile | Model | Provider | Cost Path | Status |
+|---|---|---|---|---|---|---|
+| 1. Investigate | `free` | DeepSeek V4 Flash | Nous | $0 (may be temp) | ✅ Active |
+| 2. Specs | `planner` | DS4Pro | Ollama Cloud | $15/yr | ✅ Active |
+| 3. Plan | `planner` | DS4Pro | Ollama Cloud | $15/yr | ✅ Active |
+| 4. Verify Plan | `inspector` | GLM5.1:cloud | Ollama Cloud | $15/yr | ✅ Active |
+| 5. Execute | `worker` | K2.6 | Moonshots | $40/mo | ✅ Active |
+| 6. Verify Execution | `inspector` | GLM5.1:cloud | Ollama Cloud | $15/yr | ✅ Active |
+| 7. Fix & Polish | `worker` | K2.6 | Moonshots | $40/mo | ✅ Active |
+| 8. Inspection | `inspector` | GLM5.1:cloud | Ollama Cloud | $15/yr | ✅ Active |
+| 9. Verification | `inspector` | GLM5.1:cloud | Ollama Cloud | $15/yr | ✅ Active |
+| 10. Fix | `worker` | K2.6 | Moonshots | $40/mo | ✅ Active |
+| 11. Notify | — | — | — | — | Human handoff |
 
-**Cost per full cycle:**
+**Cost per full cycle (current):**
 - Ollama Cloud: ~$1.25/cycle (light usage on unlimited $15/yr plan)
 - Moonshots: ~$1.33/cycle (light usage on $40/mo plan)
-- Free tier (investigation): $0
-- Total: essentially pennies per cycle
+- Free tier (investigation): **$0** — DeepSeek V4 Flash on Nous (free for now)
+- Fallback (free tier): **$0** — stepfun/step-3.5-flash on Nous (proven in aux tasks)
+- Total: essentially pennies per cycle — investigation stage has two free fallback layers
 
 ---
 
@@ -169,26 +172,27 @@ The full delivery pipeline, mapped to profiles. Each stage has a **gate** — cr
 
 ## FREE ENDPOINTS
 
-### 1. ring-2.6-1t (OpenRouter) ← PRIMARY FOR `free` PROFILE
+### ~~1. ring-2.6-1t (OpenRouter) — EXPIRED~~
 - **Provider:** OpenRouter (inclusionai/ring-2.6-1t)
 - **Cost:** Free — temporary offer
-- **Status:** ⚠️ Temporary — will expire
-- **Performance:** Outstanding TPS. Model card claims it can trade blows with Opus 4.7. Fastest TPS on OpenRouter.
-- **Role in pipeline:** Stage 1 (Investigate) — zero-cost research leg
+- **Status:** ❌ **Expired** — offer ended
+- **Performance:** Was outstanding TPS. Model card claimed it could trade blows with Opus 4.7. Fastest TPS on OpenRouter at the time.
+- **Role in pipeline:** Was Stage 1 (Investigate) — zero-cost research leg. Now gone.
+- **Removed from:** All profiles, all fallback chains.
 
-### 2. qwen3.6-plus (Nous) ← UNIVERSAL FALLBACK #1
+### ~~2. qwen3.6-plus (Nous) — EXPIRED~~
 - **Provider:** Nous Portal
 - **Cost:** Free — temporary offer
-- **Status:** ⚠️ Temporary — current Nous portal freebie
-- **Role in kanban stack:** Universal auxiliary fallback for all four profiles. Activated when primary AND first-level fallback fail.
-- **Notes:** Mentioned alongside deepseek-v4 flash as dual Nous freebies.
+- **Status:** ❌ **Expired** — Nous portal freebie ended
+- **Role in kanban stack:** Was universal auxiliary fallback for all four profiles. Now gone.
+- **Removed from:** All profiles, all fallback chains. DeepSeek V4 Flash replaces it.
 
-### 3. deepseek-v4 flash (Nous / OpenCode portal) ← UNIVERSAL LAST RESORT
-- **Provider:** Nous Portal (via opencode gateway) / OpenCode Go
-- **Cost:** Free — temporary offer (or $5 allocation via OpenCode Go)
-- **Status:** ⚠️ Temporary — opencode portal freebie
-- **Role in kanban stack:** Absolute last-resort model for all profiles.
-- **Notes:** Flash variant = smaller/faster distillation. Available via OpenCode Go allocation (~31k prompts).
+### 3. deepseek-v4 flash (Nous) ← CURRENT UNIVERSAL FALLBACK
+- **Provider:** Nous Portal (direct — https://inference-api.nousresearch.com/v1)
+- **Cost:** Free (currently)
+- **Status:** ⚠️ Active now — may be temporary, only time will tell
+- **Role in kanban stack:** Universal fallback for all profiles. Also the **current default model** in `config.yaml`.
+- **Notes:** Replaces both ring-2.6-1t and qwen3.6-plus in the stack. Available directly on Nous inference API, model name `deepseek/deepseek-v4-flash`. OpenRouter fallback uses `deepseek/deepseek-v4-flash:free`.
 
 ### 4. nemotron3 (OpenRouter)
 - **Provider:** OpenRouter | **Cost:** Free (always) | **Status:** Legacy / permanent
@@ -255,22 +259,22 @@ The full delivery pipeline, mapped to profiles. Each stage has a **gate** — cr
 ## SUMMARY MATRIX
 
 | # | Endpoint | Provider | Cost | Avail. | TPS | Category | Verdict |
-|---|---|---|---|---|---|---|---|
-| 1 | ring-2.6-1t | OpenRouter | Free (temp) | ⚠️ Expiring | ⭐ Outstanding | Free | ✅ Primary for `free` |
-| 2 | qwen3.6-plus | Nous | Free (temp) | ⚠️ Expiring | — | Free | ✅ Universal fallback #1 |
-| 3 | deepseek-v4 flash | OpenCode Go | Free/$5 (temp) | ⚠️ Expiring | — | Free | ✅ Universal last resort |
-| 4 | nemotron3 | OpenRouter | Free (always) | ✅ Stable | — | Free | ⚠️ Low quality fallback |
-| 5 | openrouter:free | OpenRouter | Free (always) | ✅ Stable | — | Free | ⚠️ Lowest quality router |
-| 6 | arcee | Nous | Free | ✅ Available | — | Free | 🟡 Last pick |
-| 7 | NVIDIA NIM | NVIDIA | Usage-based | ⛔ Blocked | ⚠️ Low | Radar | 🔒 Geo-restricted |
-| 8 | owl-alpha | OpenRouter | Unknown | 📋 Tested | ⚠️ Low | Radar | 🔒 Monitoring |
-| 9 | qwen3.6 27B | **Local** | **$0** | ✅ Always | TBD | **Local** | 🔬 Benchmarking |
-| 10 | qwen3.6 35B A3B | **Local** | **$0** | ✅ Always | TBD | **Local** | 🔬 Benchmarking |
-| 11 | Ollama Cloud | Ollama | **$15/year** | ✅ Active | ⚠️ Lowest | Paid | ✅ Core platform |
-| 12 | opencode:go | OpenCode | **$5** + infinity | 🔥 Active | ⭐ Fastest | Paid | ✅ Planner failover |
-| 13 | K2.6 (Moonshots) | Moonshots (Allegro) | **$40/month** | ✅ Active | ⭐ High | Paid | ✅ Worker primary |
-| 14 | MIMO (Moonshots) | Moonshots direct | **$100/mo ($77 new)** | 🔒 Personal | — | Paid | 🔥 Break-glass |
-| 15 | ZenMux | ZenMux | ~$20/month | 🆕 Eval. | ⭐ Impressive | Paid | ⚠️ Great roster, sketchy site |
+|---|---|---|---|---|---|---|---|---|
+|| ~~1~~ | ~~ring-2.6-1t~~ | ~~OpenRouter~~ | ~~Free~~ | ❌ **Expired** | ~~Outstanding~~ | ~~Free~~ | ❌ Dead |
+|| ~~2~~ | ~~qwen3.6-plus~~ | ~~Nous~~ | ~~Free~~ | ❌ **Expired** | — | ~~Free~~ | ❌ Dead |
+| 1 | **deepseek-v4 flash** | **Nous** | **Free (now)** | ⚠️ Temporary | — | Free | ✅ **Default model + universal fallback** |
+| 2 | nemotron3 | OpenRouter | Free (always) | ✅ Stable | — | Free | ⚠️ Low quality fallback |
+| 3 | openrouter:free | OpenRouter | Free (always) | ✅ Stable | — | Free | ⚠️ Lowest quality router |
+| 4 | arcee | Nous | Free | ✅ Available | — | Free | 🟡 Last pick |
+| 5 | NVIDIA NIM | NVIDIA | Usage-based | ⛔ Blocked | ⚠️ Low | Radar | 🔒 Geo-restricted |
+| 6 | owl-alpha | OpenRouter | Unknown | 📋 Tested | ⚠️ Low | Radar | 🔒 Monitoring |
+| 7 | qwen3.6 27B | **Local** | **$0** | ✅ Always | TBD | **Local** | 🔬 Benchmarking |
+| 8 | qwen3.6 35B A3B | **Local** | **$0** | ✅ Always | TBD | **Local** | 🔬 Benchmarking |
+| 9 | Ollama Cloud | Ollama | **$15/year** | ✅ Active | ⚠️ Lowest | Paid | ✅ Core platform |
+| 10 | opencode:go | OpenCode | **$5** + infinity | 🔥 Active | ⭐ Fastest | Paid | ✅ Planner failover |
+| 11 | K2.6 (Moonshots) | Moonshots (Allegro) | **$40/month** | ✅ Active | ⭐ High | Paid | ✅ Worker primary |
+| 12 | MIMO (Moonshots) | Moonshots direct | **$100/mo ($77 new)** | 🔒 Personal | — | Paid | 🔥 Break-glass |
+| 13 | ZenMux | ZenMux | ~$20/month | 🆕 Eval. | ⭐ Impressive | Paid | ⚠️ Great roster, sketchy site |
 
 ---
 
@@ -278,7 +282,7 @@ The full delivery pipeline, mapped to profiles. Each stage has a **gate** — cr
 
 ### Profile → Pipeline Mapping
 ```
-Stage 1  (Investigate)  →  free        →  ring-2.6-1t      (OpenRouter)
+Stage 1  (Investigate)  →  free        →  deepseek/deepseek-v4-flash  (Nous)
 Stage 2  (Specs)        →  planner     →  ds4pro           (Ollama Cloud)
 Stage 3  (Plan)         →  planner     →  ds4pro           (Ollama Cloud)
 Stage 4  (Verify Plan)  →  inspector   →  glm5.1:cloud     (Ollama Cloud)
@@ -291,21 +295,20 @@ Stage 10 (Final Fix)    →  worker      →  k2.6             (Moonshots)
 Stage 11 (Auditor)      →  YOU         →  human review
 ```
 
-### 🆓 `free` — Zero-Cost Research Profile
-- **Model:** ring-2.6-1t (OpenRouter)
-- **Primary:** OpenRouter
-- **Fallback 1:** Nous Qwen3.6 Plus
-- **Fallback 2:** DeepSeek V4 Flash via OpenCode Go
+### 🆓 `free` — Zero-Cost Research Profile (Resurrected)
+- **Model:** deepseek/deepseek-v4-flash
+- **Primary:** Nous (direct — https://inference-api.nousresearch.com/v1)
+- **Fallback:** stepfun/step-3.5-flash (Nous — same base URL, proven in auxiliary tasks)
 - **Character:** Helpful, reasoning shown, lighter toolset (no code execution, no system tools)
 - **Max turns:** 120
 - **Pipeline role:** Stage 1 — Investigate
+- **Status:** ✅ **Active** — replaced expired ring-2.6-1t and qwen3.6-plus with deepseek flash + stepfun fallback
 
 ### 🧠 `planner` — DS4Pro Reasoning
 - **Model:** ds4pro
 - **Primary:** Ollama Cloud
-- **Fallback 1:** OpenCode Go DS4Pro
-- **Fallback 2:** Nous Qwen3.6 Plus
-- **Fallback 3:** DeepSeek V4 Flash via OpenCode Go
+- **Fallback 1:** DeepSeek V4 Flash (Nous — direct)
+- **Fallback 2:** OpenCode Go DS4Pro
 - **Character:** Technical, full reasoning visible
 - **Max turns:** 200
 - **Pipeline role:** Stages 2–3 (Specs + Plan)
@@ -314,8 +317,7 @@ Stage 11 (Auditor)      →  YOU         →  human review
 - **Model:** k2.6
 - **Primary:** Moonshots
 - **Fallback 1:** Ollama Cloud K2.6
-- **Fallback 2:** Nous Qwen3.6 Plus
-- **Fallback 3:** DeepSeek V4 Flash via OpenCode Go
+- **Fallback 2:** DeepSeek V4 Flash (Nous — direct)
 - **Character:** Concise, no reasoning fluff, tool-use enforced
 - **Max turns:** 60
 - **Pipeline role:** Stages 5, 7, 10 (Execute + Fix + Polish + Final Fix)
@@ -323,8 +325,7 @@ Stage 11 (Auditor)      →  YOU         →  human review
 ### 🔍 `inspector` — GLM5.1 QA Review
 - **Model:** glm5.1:cloud
 - **Primary:** Ollama Cloud
-- **Fallback 1:** Nous Qwen3.6 Plus
-- **Fallback 2:** DeepSeek V4 Flash via OpenCode Go
+- **Fallback 1:** DeepSeek V4 Flash (Nous — direct)
 - **Character:** Helpful, thorough, shows reasoning for audit trails
 - **Max turns:** 300
 - **Pipeline role:** Stages 4, 6, 8, 9 (Verify Plan + Verify Execution + Inspection + Verification)
@@ -332,11 +333,12 @@ Stage 11 (Auditor)      →  YOU         →  human review
 ---
 
 ## ⚠️ Remaining Confirmations
-1. **DeepSeek V4 Flash model name** — `deepseek-v4-flash` in OpenCode Go?
-2. **Nous Qwen3.6 Plus model name** — `qwen3.6-plus` confirmed?
-3. **ZenMux evaluation** — pending TPS / catalog mapping
-4. **Phase 1 specialist roster** — central planning artifact
-5. **Moonshots Discord** — MIMO $70/month answer
-6. **Rate limits / expirations** on temp free offers
-7. **Local Qwen benchmark results** — awaiting promotion decision
-8. **Inspector fallback satisfaction** — Qwen3.6 Plus + DeepSeek Flash as safety net?
+1. ~~**DeepSeek V4 Flash model name** — `deepseek-v4-flash` in OpenCode Go?~~ ✅ **Resolved** — It's `deepseek/deepseek-v4-flash` on Nous, and `deepseek/deepseek-v4-flash:free` on OpenRouter fallback.
+2. ~~**Nous Qwen3.6 Plus model name** — `qwen3.6-plus` confirmed?~~ ❌ **Moot** — qwen3.6-plus expired. Not needed anymore.
+3. ~~**ring-2.6-1t** — will it last?~~ ❌ **Expired** — answer came.
+4. **ZenMux evaluation** — pending TPS / catalog mapping
+5. **Phase 1 specialist roster** — central planning artifact
+6. **Moonshots Discord** — MIMO $70/month answer
+7. **Rate limits / expirations** on remaining free offers (DeepSeek V4 Flash on Nous)
+8. **Local Qwen benchmark results** — awaiting promotion decision
+9. ~~**What replaces the `free` profile?**~~ ✅ **Resolved** — DeepSeek V4 Flash (primary) + stepfun/step-3.5-flash (fallback), both on Nous.
