@@ -4,6 +4,7 @@
 > and patterns that don't fit in structured endpoint documentation.
 > These are the things the next agent needs to understand *why* we built it this way.
 > Copied from ~/Desktop/agenda/companion.md — mirror for RiveDesNuages folder.
+> Last update: 2026-05-19 — free profile resurrected with 4-layer fallback, Ollama Cloud phase-out (FA→FO), CC profile added.
 
 ---
 
@@ -65,20 +66,22 @@ Two free models died on the same day:
 1. **ring-2.6-1t (OpenRouter)** — was the `free` profile's primary for Stage 1 (Investigate). Outstanding TPS, zero cost. Gone.
 2. **qwen3.6-plus (Nous)** — was the universal fallback for ALL four profiles. Every profile's safety net. Gone.
 
-**What survived:** DeepSeek V4 Flash on Nous (`deepseek/deepseek-v4-flash`). It's free *for now*, but so were the other two. The pattern is clear: **free offers on inference APIs are temporary by nature.** The only permanent $0 inference path is local models.
+**What survived:** `deepseek-v4-flash` on nous (`deepseek/deepseek-v4-flash`). It's free *for now*, but so were the other two. The pattern is clear: **free offers on inference APIs are temporary by nature.** The only permanent $0 inference path is local models.
 
-### Implications
-- The `free` profile is **mothballed** — no working free model to drive it
-- Current config.yaml is a **single-model setup**: deepseek-v4-flash on Nous, OpenRouter fallback for the same model
-- The kanban pipeline still exists conceptually (profiles for planner/inspector/worker on paid endpoints) but investigation (Stage 1) has no dedicated zero-cost model
-- **Local models are the only reliable long-term $0 path** — qwen3.6 27B or 35B A3B benchmarking just became more urgent
-- DeepSeek V4 Flash on Nous is now the single thread holding the free tier together
+### Resurrection: Multi-Layer Free Fallback (2026-05-19)
 
-### Resurrection: stepfun/step-3.5-flash as Free Fallback
+The `free` profile was revived and hardened with a four-layer fallback chain:
+1. `deepseek-v4-flash` on nous (primary — direct)
+2. `deepseek/deepseek-v4-flash:free` on openrouter (fallback 1)
+3. `deepseek-v4-flash` on opencode-go (fallback 2)
+4. `stepfun/step-3.5-flash` on nous (last resort — proven in Hermes auxiliary tasks)
 
-The `free` profile was revived using `stepfun/step-3.5-flash` on Nous as its fallback — the same model already proven in Hermes' auxiliary tasks (web_extract, compression, session_search, skills_hub, approval, mcp, title_generation, triage_specifier, curator). It's not a reasoning powerhouse like DS4Pro, but for investigation-stage research and quick analysis, it's more than enough. And it costs $0 — for now.
-
-**Moral:** When free primaries die, look at what you're already running in the background. Sometimes the workhorse is already in the stable.
+**Implications:**
+- The `free` profile is **active** with four chances before it goes dark
+- Current config.yaml default is `deepseek-v4-pro` on ollama-cloud (⚠️ phase-out — FA→FO escalation, burn quotas while they last)
+- CC profile mirrors the default config to maximize Ollama quota depletion
+- **Local models are the only reliable long-term $0 path** — qwen3.6 27B or 35B A3B benchmarking remains urgent
+- The extinction pattern is clear: free API offers die. The fallback chain buys time.
 
 ---
 
