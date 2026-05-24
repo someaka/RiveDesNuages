@@ -1,9 +1,9 @@
 # Endpoint Notes
 
 > Compiled from conversation on 2026-05-11. Ongoing — updated as user rambles through.
-> Last update: 2026-05-19 — Ollama Cloud phase-out (FA→FO), CC profile added, opencode-go in free fallback chain, ds4pro→deepseek-v4-pro.
+> Last update: 2026-05-21 — Ollama Cloud removed (refund collected)
 > Mirror copy — original lives at ~/Desktop/agenda/notes.md
-> Ground truth config: ~/.hermes/config.yaml (single-model: deepseek-v4-pro on ollama-cloud)
+> Ground truth config: ~/.hermes/config.yaml (single-model: deepseek-v4-flash on opencode-go)
 
 ---
 
@@ -16,9 +16,9 @@ The full delivery pipeline, mapped to profiles. Each stage has a **gate** — cr
  │ INVESTIGATE  │───→│ SPECS    │───→│ PLAN    │───→│ VERIFY PLAN  │───→│ EXECUTE      │
  │              │    │          │    │         │    │              │    │              │
  │ free         │    │ planner  │    │ planner │    │ inspector    │    │ worker       │
- │ deepseek-    │    │ deepseek-│    │         │    │ glm-5.1:cloud│    │ kimi-k2.6    │
- │ v4-flash     │    │ v4-pro   │    │         │    │ ollama-cloud │    │ kimi-coding  │
- │ (nous)       │    │ ollama   │    │         │    │ (⚠️ phase-out)│   │              │
+ │ deepseek-    │    │ deepseek-│    │         │    │ deepseek-    │    │ kimi-k2.6    │
+ │ v4-flash     │    │ v4-flash │    │         │    │ v4-flash     │    │ kimi-coding  │
+ │ (nous)       │    │ (nous)   │    │         │    │ (nous)       │    │              │
  └──────┬───────┘    └────┬─────┘    └────┬────┘    └──────┬───────┘    └──────┬───────┘
         │                  │               │                │                   │
         │                  │               │                │                   │
@@ -31,9 +31,9 @@ The full delivery pipeline, mapped to profiles. Each stage has a **gate** — cr
  │ EXECUTION    │    │ POLISH   │    │         │    │ EXECUTION    │◄───│ FOR AUDIT    │
  │              │    │          │    │ inspect │    │              │    │              │
  │ inspector    │    │ worker   │    │ inspect │    │ inspector    │    │              │
- │ glm-5.1:cloud│    │ kimi-k2.6│    │         │    │ glm-5.1:cloud│    │ (final       │
- │ ollama-cloud │    │ kimi-    │    │ ollama- │    │ ollama-cloud │    │  output)     │
- │ (⚠️ phase-out)│   │ coding   │    │ cloud   │    │ (⚠️ phase-out)│   │              │
+ │ deepseek-    │    │ kimi-k2.6│    │         │    │ deepseek-    │    │ (final       │
+ │ v4-flash     │    │ kimi-    │    │ deepseek-│    │ v4-flash     │    │  output)     │
+ │ (nous)       │    │ coding   │    │ v4-flash │    │ (nous)       │    │              │
         │                  │               │                │
         │                  │               │                │
         │                  │               │                │
@@ -53,7 +53,7 @@ The full delivery pipeline, mapped to profiles. Each stage has a **gate** — cr
 
 #### 2. SPECS — `planner` profile (deepseek-v4-pro)
 - **Goal:** Translate investigation into technical specifications. Define what needs building.
-- **Profile:** `planner` ← deepseek-v4-pro reasoning on ollama-cloud (⚠️ phase-out, deplete quotas first), opencode-go fallback
+- **Profile:** `planner` ← deepseek/deepseek-v4-flash reasoning on nous, opencode-go fallback
 - **Toolsets:** web, memory, session search, code_execution (validation), file (read-only), vision
 - **Output:** Detailed specs document — inputs, outputs, edge cases, interfaces
 - **Handoff gate:** Specs are complete, testable, and reviewed.
@@ -65,21 +65,21 @@ The full delivery pipeline, mapped to profiles. Each stage has a **gate** — cr
 - **Output:** Task decomposition — ordered steps, dependencies, estimated complexity
 - **Handoff gate:** Each task is atomic enough for kimi-k2.6 to execute independently.
 
-#### 4. VERIFY PLAN — `inspector` profile (glm-5.1:cloud)
+#### 4. VERIFY PLAN — `inspector` profile (deepseek-v4-flash)
 - **Goal:** QA the plan before execution. Catch gaps, contradictions, missing edge cases.
-- **Profile:** `inspector` ← glm-5.1:cloud on ollama-cloud (⚠️ phase-out), deepseek-v4-flash fallback
+- **Profile:** `inspector` ← deepseek/deepseek-v4-flash on nous, opencode-go fallback
 - **Toolsets:** file (read specs + plan), memory (historical context), code_execution (feasibility checks)
 - **Output:** Plan review with approved/blocker flags
 - **Handoff gate:** Plan passes inspection. All blockers resolved.
 
 #### 5. EXECUTE — `worker` profile (kimi-k2.6)
 - **Goal:** Build/implement. Rip through the task decomposition.
-- **Profile:** `worker` ← kimi-k2.6 on kimi-coding, ollama-cloud fallback
+- **Profile:** `worker` ← kimi-k2.6 on kimi-coding
 - **Toolsets:** Full system — terminal, file, code_execution, web, memory, vision, image_gen, tts, cronjob
 - **Output:** Implementation artifacts — code, configs, files
 - **Handoff gate:** All tasks marked complete. Execution log available.
 
-#### 6. VERIFY EXECUTION — `inspector` profile (glm-5.1:cloud)
+#### 6. VERIFY EXECUTION — `inspector` profile (deepseek-v4-flash)
 - **Goal:** QA the output. Test it. Find bugs, gaps, regressions.
 - **Profile:** `inspector` ← same
 - **Toolsets:** file (read output), code_execution (run tests/verify), memory (compare against specs)
@@ -93,13 +93,13 @@ The full delivery pipeline, mapped to profiles. Each stage has a **gate** — cr
 - **Output:** Patched artifacts
 - **Handoff gate:** All fixes applied. Re-submit for inspection.
 
-#### 8. INSPECTION — `inspector` profile (glm-5.1:cloud)
+#### 8. INSPECTION — `inspector` profile (deepseek-v4-flash)
 - **Goal:** Final deep review. End-to-end audit of deliverables.
 - **Profile:** `inspector` ← same
 - **Toolsets:** Full read + verify toolkit
 - **Output:** Final quality report
 
-#### 9. VERIFICATION — `inspector` profile (glm-5.1:cloud)
+#### 9. VERIFICATION — `inspector` profile (deepseek-v4-flash)
 - **Goal:** Confirm everything meets the original specs. Trace back to step 2.
 - **Profile:** `inspector` ← same
 - **Output:** Sign-off or loop back to fix
@@ -121,19 +121,19 @@ The full delivery pipeline, mapped to profiles. Each stage has a **gate** — cr
 | Stage | Profile | Model | Provider | Cost Path | Status |
 |---|---|---|---|---|---|---|
 || 1. Investigate | `free` | `deepseek-v4-flash` | nous | $0 (temporary) | ✅ Active |
-|| 2. Specs | `planner` | `deepseek-v4-pro` | ollama-cloud | $15/yr (⚠️ phase-out) | ✅ Active |
-|| 3. Plan | `planner` | `deepseek-v4-pro` | ollama-cloud | $15/yr (⚠️ phase-out) | ✅ Active |
-|| 4. Verify Plan | `inspector` | `glm-5.1:cloud` | ollama-cloud | $15/yr (⚠️ phase-out) | ✅ Active |
+|| 2. Specs | `planner` | `deepseek-v4-pro` | opencode-go | $5 promo (temporary) | ✅ Active |
+|| 3. Plan | `planner` | `deepseek-v4-pro` | opencode-go | $5 promo (temporary) | ✅ Active |
+|| 4. Verify Plan | `inspector` | `deepseek-v4-flash` | nous | Free (temporary) | ✅ Active |
 || 5. Execute | `worker` | `kimi-k2.6` | kimi-coding | $40/mo | ✅ Active |
-|| 6. Verify Execution | `inspector` | `glm-5.1:cloud` | ollama-cloud | $15/yr (⚠️ phase-out) | ✅ Active |
+|| 6. Verify Execution | `inspector` | `deepseek-v4-flash` | nous | Free (temporary) | ✅ Active |
 || 7. Fix & Polish | `worker` | `kimi-k2.6` | kimi-coding | $40/mo | ✅ Active |
-|| 8. Inspection | `inspector` | `glm-5.1:cloud` | ollama-cloud | $15/yr (⚠️ phase-out) | ✅ Active |
-|| 9. Verification | `inspector` | `glm-5.1:cloud` | ollama-cloud | $15/yr (⚠️ phase-out) | ✅ Active |
+|| 8. Inspection | `inspector` | `deepseek-v4-flash` | nous | Free (temporary) | ✅ Active |
+|| 9. Verification | `inspector` | `deepseek-v4-flash` | nous | Free (temporary) | ✅ Active |
 || 10. Fix | `worker` | `kimi-k2.6` | kimi-coding | $40/mo | ✅ Active |
 | 11. Notify | — | — | — | — | Human handoff |
 
 **Cost per full cycle (current):**
-- ollama-cloud: ~$1.25/cycle (light usage on $15/yr plan — ⚠️ phase-out, burn quotas)
+- ~~ollama-cloud: ~$1.25/cycle — DEPRECATED (refund collected, service dead)~~
 - kimi-coding: ~$1.33/cycle (light usage on $40/mo plan)
 - Free tier (investigation): **$0** — deepseek-v4-flash on nous (may be temporary) → openrouter → opencode-go → stepfun/step-3.5-flash
 - Total: essentially pennies per cycle — investigation stage has four fallback layers
@@ -142,12 +142,9 @@ The full delivery pipeline, mapped to profiles. Each stage has a **gate** — cr
 
 ## OPERATIONAL SCHEDULING NOTES
 
-### Ollama Cloud — Peak Hours (Europe) + ⚠️ PHASE-OUT
-- **Status:** Being phased out (hostile moderator behavior, FA→FO escalation on all social networks). Refund pending.
-- **Rule:** MUST USE IN PRIORITY while any quota remains. Fallback providers are wired but NOT hit until quotas are truly dry.
-- **Heavy-duty window:** 13:00–18:00 UTC+2 (Europe's peak usage)
-- **Schedule pipeline stages 2–4, 6, 8–9 OUTSIDE this window**
-- **Applies to:** inspector (glm-5.1:cloud), planner (deepseek-v4-pro), worker fallback path
+### ~~Ollama Cloud — Peak Hours (Europe)~~ ❌ DEPRECATED
+- **Status:** Service dead. Refund collected. All profiles migrated to nous, opencode-go, or openrouter.
+- **Applies to:** N/A — fully removed from all profiles.
 
 ### MIMO — Off-Peak Sweet Spot
 - **Optimal window:** 16:00–02:00 UTC+2
@@ -166,7 +163,6 @@ The full delivery pipeline, mapped to profiles. Each stage has a **gate** — cr
 |---|---|
 | 02:00–12:00 | Pipeline execution — stages 1–6 while US/Asia infra is fresh |
 | 12:00–13:00 | Buffer / handoff window |
-| 13:00–18:00 | **Ollama Cloud peak — AVOID heavy pipeline stages** |
 | 16:00–02:00 | K2.6/MIMO off-peak — best for stages 5, 7, 10 on Moonshots |
 | 18:00–02:00 | Pipeline execution resumes — stages 6–11 |
 
@@ -231,12 +227,10 @@ The full delivery pipeline, mapped to profiles. Each stage has a **gate** — cr
 
 ## PAID ENDPOINTS
 
-### 11. ollama-cloud ⭐ CORE PLATFORM — ⚠️ PHASE-OUT
-- **Cost:** $15/year Pro plan — unlimited quotas
-- **Models hosted:** glm-5.1:cloud, kimi-k2.6, deepseek-v4-pro
-- **Role:** Pipeline stages 2–4 (planner + inspector), worker fallback
-- **⚠️ Phase-out:** Hostile moderator behavior, FA→FO escalation on all social networks. Refund pending. MUST USE IN PRIORITY while any quota remains. Fallback providers wired but NOT hit until quotas dry.
-- **⚠️ Peak hours:** 13:00–18:00 UTC+2
+### ~~11. ollama-cloud~~ ❌ DEPRECATED — SERVICE DEAD
+- **Status:** Refund collected. Service fully shut down. All profiles migrated to nous, opencode-go, or openrouter.
+- **Models previously hosted:** glm-5.1:cloud, kimi-k2.6, deepseek-v4-pro
+- **Migrated to:** deepseek-v4-flash on nous (planner/inspector), opencode-go (planner fallback), kimi-coding (worker)
 
 ### 12. opencode-go 🔥 TIER-1 FAILOVER
 - **Cost:** $5 (promo) + "infinity" temporary bonus
@@ -247,7 +241,7 @@ The full delivery pipeline, mapped to profiles. Each stage has a **gate** — cr
 ### 13. Moonshots Direct — K2.6
 - **Cost:** $40/month Allegro plan — autorenewing
 - **Role:** Pipeline stages 5, 7, 10 (execution legs)
-- **Fallback:** Ollama Cloud K2.6
+- **Fallback:** deepseek-v4-flash (nous)
 
 ### 14. MIMO Endpoint
 - **Cost:** $100/mo standard / $77 new-customer / potentially $70/mo (Discord pending)
@@ -274,7 +268,7 @@ The full delivery pipeline, mapped to profiles. Each stage has a **gate** — cr
 | 6 | owl-alpha | OpenRouter | Unknown | 📋 Tested | ⚠️ Low | Radar | 🔒 Monitoring |
 | 7 | qwen3.6 27B | **Local** | **$0** | ✅ Always | TBD | **Local** | 🔬 Benchmarking |
 | 8 | qwen3.6 35B A3B | **Local** | **$0** | ✅ Always | TBD | **Local** | 🔬 Benchmarking |
-| 9 | ollama-cloud | Ollama | **$15/year** | ✅ Active | ⚠️ Lowest | Paid | ⚠️ Core platform — phase-out |
+| ~~9~~ | ~~ollama-cloud~~ | ~~Ollama~~ | ~~$15/year~~ | ❌ **Dead** | ~~⚠️ Lowest~~ | ~~Paid~~ | ❌ **Service shut down, refund collected** |
 | 10 | opencode-go | OpenCode | **$5** + infinity | 🔥 Active | ⭐ Fastest | Paid | ✅ Planner failover + free fallback |
 | 11 | K2.6 (Moonshots) | Moonshots (Allegro) | **$40/month** | ✅ Active | ⭐ High | Paid | ✅ Worker primary |
 | 12 | MIMO (Moonshots) | Moonshots direct | **$100/mo ($77 new)** | 🔒 Personal | — | Paid | 🔥 Break-glass |
@@ -287,14 +281,14 @@ The full delivery pipeline, mapped to profiles. Each stage has a **gate** — cr
 ### Profile → Pipeline Mapping
 ```
 Stage 1  (Investigate)  →  free        →  deepseek-v4-flash  (nous)
-Stage 2  (Specs)        →  planner     →  deepseek-v4-pro    (ollama-cloud, ⚠️ phase-out)
-Stage 3  (Plan)         →  planner     →  deepseek-v4-pro    (ollama-cloud, ⚠️ phase-out)
-Stage 4  (Verify Plan)  →  inspector   →  glm-5.1:cloud      (ollama-cloud, ⚠️ phase-out)
+Stage 2  (Specs)        →  planner     →  deepseek-v4-pro    (opencode-go)
+Stage 3  (Plan)         →  planner     →  deepseek-v4-pro    (opencode-go)
+Stage 4  (Verify Plan)  →  inspector   →  deepseek-v4-flash  (nous)
 Stage 5  (Execute)      →  worker      →  kimi-k2.6          (kimi-coding)
-Stage 6  (Verify Exec)  →  inspector   →  glm-5.1:cloud      (ollama-cloud, ⚠️ phase-out)
+Stage 6  (Verify Exec)  →  inspector   →  deepseek-v4-flash  (nous)
 Stage 7  (Fix & Polish) →  worker      →  kimi-k2.6          (kimi-coding)
-Stage 8  (Inspection)   →  inspector   →  glm-5.1:cloud      (ollama-cloud, ⚠️ phase-out)
-Stage 9  (Verification) →  inspector   →  glm-5.1:cloud      (ollama-cloud, ⚠️ phase-out)
+Stage 8  (Inspection)   →  inspector   →  deepseek-v4-flash  (nous)
+Stage 9  (Verification) →  inspector   →  deepseek-v4-flash  (nous)
 Stage 10 (Final Fix)    →  worker      →  kimi-k2.6          (kimi-coding)
 Stage 11 (Auditor)      →  YOU         →  human review
 ```
@@ -308,10 +302,10 @@ Stage 11 (Auditor)      →  YOU         →  human review
 - **Pipeline role:** Stage 1 — Investigate
 - **Status:** ✅ **Active** — four-layer fallback chain for zero-cost investigation
 
-### 🧠 `planner` — DeepSeek V4 Pro Reasoning
-- **Model:** `deepseek-v4-pro`
-- **Primary:** ollama-cloud (⚠️ phase-out — deplete quotas first)
-- **Fallback 1:** deepseek-v4-flash (nous)
+### 🧠 `planner` — DeepSeek V4 Flash Reasoning
+- **Model:** `deepseek-v4-flash`
+- **Primary:** deepseek/deepseek-v4-flash on nous
+- **Fallback 1:** deepseek-v4-flash (opencode-go)
 - **Fallback 2:** deepseek-v4-pro (opencode-go)
 - **Character:** Technical, full reasoning visible
 - **Max turns:** 200
@@ -320,26 +314,25 @@ Stage 11 (Auditor)      →  YOU         →  human review
 ### 🔧 `worker` — Kimi K2.6 Execution Engine
 - **Model:** `kimi-k2.6`
 - **Primary:** kimi-coding
-- **Fallback 1:** kimi-k2.6 (ollama-cloud, ⚠️ phase-out)
-- **Fallback 2:** deepseek-v4-flash (nous)
+- **Fallback 1:** deepseek-v4-flash (nous)
 - **Character:** Concise, no reasoning fluff, tool-use enforced
 - **Max turns:** 60
 - **Pipeline role:** Stages 5, 7, 10 (Execute + Fix + Polish + Final Fix)
 
-### 🔍 `inspector` — GLM5.1 Cloud QA Review
-- **Model:** `glm-5.1:cloud`
-- **Primary:** ollama-cloud (⚠️ phase-out — deplete quotas first)
-- **Fallback 1:** deepseek-v4-flash (nous)
+### 🔍 `inspector` — DeepSeek V4 Flash QA Review
+- **Model:** `deepseek-v4-flash`
+- **Primary:** deepseek/deepseek-v4-flash on nous
+- **Fallback 1:** deepseek-v4-flash (opencode-go)
 - **Character:** Helpful, thorough, shows reasoning for audit trails
 - **Max turns:** 300
 - **Pipeline role:** Stages 4, 6, 8, 9 (Verify Plan + Verify Execution + Inspection + Verification)
 
-### 🆕 `CC` — Current Default Mirror (Ollama Quota Burn)
-- **Model:** `deepseek-v4-pro`
-- **Primary:** ollama-cloud (⚠️ phase-out — DEPLETE ASAP)
+### 🆕 `CC` — Current Default Mirror (OpenCode Go Primary)
+- **Model:** `deepseek-v4-flash`
+- **Primary:** deepseek-v4-flash on opencode-go
 - **Fallback:** openrouter (`deepseek/deepseek-v4-flash:free`)
 - **Character:** Full toolset, 9999 max turns, no tool enforcement
-- **Purpose:** Mirror of current `~/.hermes/config.yaml`. Burns Ollama Cloud quotas on general tasks until refund/service cut-off.
+- **Purpose:** Mirror of current `~/.hermes/config.yaml`. Formerly burned Ollama Cloud quotas; now uses opencode-go as primary.
 
 ---
 

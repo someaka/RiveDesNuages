@@ -78,9 +78,8 @@ The `free` profile was revived and hardened with a four-layer fallback chain:
 
 **Implications:**
 - The `free` profile is **active** with four chances before it goes dark
-- Current config.yaml default is `deepseek-v4-pro` on ollama-cloud (⚠️ phase-out — FA→FO escalation, burn quotas while they last)
-- CC profile mirrors the default config to maximize Ollama quota depletion
-- **Local models are the only reliable long-term $0 path** — qwen3.6 27B or 35B A3B benchmarking remains urgent
+- **Ollama Cloud is gone** — refund collected, churn campaign successful, all profiles migrated to nous/opencode-go/openrouter fallbacks
+- **Local models are the only reliable long-term $0 path** — llama.cpp on Intel N95 is the next frontier to explore
 - The extinction pattern is clear: free API offers die. The fallback chain buys time.
 
 ---

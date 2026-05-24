@@ -1,16 +1,17 @@
-## planner profile — DS4Pro reasoning for task decomposition
+## planner profile — DeepSeek V4 reasoning for task decomposition
 ## Usage: hermes -p planner
 
 model:
-  default: deepseek-v4-pro
-  provider: ollama-cloud
-  base_url: https://api.ollama.cloud/v1
+  default: deepseek/deepseek-v4-flash
+  provider: nous
+  base_url: https://inference-api.nousresearch.com/v1
   api_mode: chat_completions
 providers: {}
 fallback_providers:
-- provider: nous
-  model: deepseek/deepseek-v4-flash
-  base_url: https://inference-api.nousresearch.com/v1
+- provider: opencode-go
+  model: deepseek-v4-flash
+  base_url: https://api.opencode.ai/v1
+  api_mode: chat_completions
 credential_pool_strategies: {}
 
 ## Planner needs strong reasoning, longer context, more turns
@@ -40,8 +41,8 @@ display:
   interim_assistant_messages: true
 
 ## Scheduling:
-## Subject to Ollama Cloud peak degradation 13:00–18:00 UTC+2
 ## Nous: no known peak constraints
+## OpenCode: no known peak constraints
 compression:
   enabled: true
   threshold: 0.4

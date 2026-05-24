@@ -8,12 +8,10 @@ model:
   api_mode: chat_completions
 providers: {}
 fallback_providers:
-- provider: ollama-cloud
-  model: k2.6
-  base_url: https://api.ollama.cloud/v1
 - provider: nous
   model: deepseek/deepseek-v4-flash
   base_url: https://inference-api.nousresearch.com/v1
+  api_mode: chat_completions
 credential_pool_strategies: {}
 
 ## K2.6 is an execution engine, not a thinker.
@@ -49,7 +47,6 @@ display:
 
 ## Scheduling:
 ## Moonshots direct: 16:00–02:00 UTC+2 (shared infra with MIMO)
-## Ollama Cloud fallback: avoid 13:00–18:00 UTC+2 peak
 ## Nous: no known peak constraints
 compression:
   enabled: true

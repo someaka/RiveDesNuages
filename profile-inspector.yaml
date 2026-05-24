@@ -1,16 +1,19 @@
-## inspector profile — GLM5.1:cloud via Ollama Cloud (hosted, not local)
+## inspector profile — DeepSeek V4 Flash via Nous (post-Ollama)
 ## Usage: hermes -p inspector
+## Note: Ollama Cloud gone — replaced with Nous primary.
+##        GLM not available outside ollama-cloud, moved to DeepSeek V4.
 
 model:
-  default: glm5.1:cloud
-  provider: ollama-cloud
-  base_url: https://api.ollama.cloud/v1
+  default: deepseek/deepseek-v4-flash
+  provider: nous
+  base_url: https://inference-api.nousresearch.com/v1
   api_mode: chat_completions
 providers: {}
 fallback_providers:
-- provider: nous
-  model: deepseek/deepseek-v4-flash
-  base_url: https://inference-api.nousresearch.com/v1
+- provider: opencode-go
+  model: deepseek-v4-flash
+  base_url: https://api.opencode.ai/v1
+  api_mode: chat_completions
 credential_pool_strategies: {}
 
 ## Inspector: quality assurance, review, catch mistakes
@@ -40,8 +43,8 @@ display:
   interim_assistant_messages: true
 
 ## Scheduling:
-## Subject to Ollama Cloud peak degradation 13:00–18:00 UTC+2
 ## Nous: no known peak constraints
+## OpenCode: no known peak constraints
 compression:
   enabled: true
   threshold: 0.5
