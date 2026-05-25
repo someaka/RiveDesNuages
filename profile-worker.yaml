@@ -5,7 +5,6 @@ model:
   default: kimi-k2.6
   provider: kimi-coding
   base_url: https://api.kimi.com/coding
-  api_mode: chat_completions
 providers: {}
 fallback_providers:
 - provider: nous
