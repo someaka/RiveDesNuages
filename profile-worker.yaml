@@ -2,9 +2,9 @@
 ## Usage: hermes -p worker
 
 model:
-  default: k2.6
+  default: kimi-k2.6
   provider: kimi-coding
-  base_url: https://api.moonshot.cn/v1
+  base_url: https://api.kimi.com/coding
   api_mode: chat_completions
 providers: {}
 fallback_providers:

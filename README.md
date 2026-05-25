@@ -26,7 +26,7 @@ As of 2026-05-21:
 | `profile-planner.yaml` | `~/.hermes/profiles/planner/config.yaml` | Reasoning: `deepseek-v4-flash` on nous → opencode-go fallback |
 | `profile-inspector.yaml` | `~/.hermes/profiles/inspector/config.yaml` | QA: `deepseek-v4-flash` on nous → opencode-go fallback |
 | `profile-free.yaml` | `~/.hermes/profiles/free/config.yaml` | Zero-cost research: `deepseek-v4-flash` on nous → openrouter → opencode-go → stepfun/step-3.5-flash |
-| `profile-cc.yaml` | `~/.hermes/config.yaml` | CC profile — `deepseek-v4-flash` on opencode-go → openrouter/nous fallback |
+| `profile-cc.yaml` | `~/.hermes/profiles/cc/config.yaml` | CC profile — `deepseek-v4-flash` on opencode-go → openrouter/nous fallback |
 
 ## Notes
 - These are **snapshot copies**, not symlinks. If the originals change, this folder will drift.

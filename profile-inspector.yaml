@@ -12,7 +12,7 @@ providers: {}
 fallback_providers:
 - provider: opencode-go
   model: deepseek-v4-flash
-  base_url: https://api.opencode.ai/v1
+  base_url: https://opencode.ai/zen/go/v1
   api_mode: chat_completions
 credential_pool_strategies: {}
 
